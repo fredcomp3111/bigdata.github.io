@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+  crossorigin="anonymous"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.4.6/css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.4.6/js/tabulator.min.js"></script>
+<title>Coding Exercise - Fred</title>
+<script type="text/javascript">
+
+    function getData(handleData)
+    {
+        $.ajax({
+	        type: "GET",
+            headers: {"Content-type" : "application/json"},
+            url: "http://api.fixer.io/latest?base=USD",
+            dataType: "json",
+            processData: false,
+            success: function(data) {
+                    
+                var $currencyData = data.rates;   
+                var $newCurrencyData = [];
+                var $i = 0
+
+                jQuery.each($currencyData, function(currency, val) {
+                    $newCurrencyData[$i] = {
+                        currency: currency,
+                        val :val+10.0002
+                    };
+                    $i++;
+                });
+
+        $("#initial-table").tabulator({
+            height:"320px", 
+            layout:'fitColumns', 
+            columns:[ 
+                {title:"Currency", field:"currency", sorter:"string"},
+                {title:"Value", field:"val", sorter:"number"},
+            ],
+            rowFormatter:function(row){
+                var data = row.getData();
+
+                if(data.currency === "HKD"){
+                    row.getElement().css({"border": "2px solid red"});
+                }else if(isEven(parseFloat(data.val)))
+                {
+                    row.getElement().css({"border": "2px solid red"});
+                }
+            }
+        });
+                $("#initial-table").tabulator("setData", $newCurrencyData);
+            }
+        })
+    }
+
+    function isEven(n) {
+        var lastDigit = n.toString().split('').pop();
+        
+        return (lastDigit % 2 == 0);
+    }
+</script>
+</head>
+<body>
+
+<div id="initial-table"></div>
+<script type="text/javascript">
+    getData(function(output){
+});
+</script>
+
+</body>
+</html>
